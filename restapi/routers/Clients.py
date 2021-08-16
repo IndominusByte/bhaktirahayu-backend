@@ -32,9 +32,13 @@ async def identity_card_ocr(request: Request, form_data: identity_card_ocr_form 
         path_upload='identity_ocr/{}'.format(form_data['kind'])
     )
     if form_data['kind'] == 'kis':
-        return request.app.state.ocr_kis.extract_image_to_text(image_ocr)
+        result = request.app.state.ocr_kis.extract_image_to_text(image_ocr)
+        MagicImage.delete_image(image_ocr,path_delete='identity_ocr/kis/')
     if form_data['kind'] == 'ktp':
-        return request.app.state.ocr_ktp.extract_image_to_text(image_ocr)
+        result = request.app.state.ocr_ktp.extract_image_to_text(image_ocr)
+        MagicImage.delete_image(image_ocr,path_delete='identity_ocr/ktp/')
+
+    return result
 
 @router.post('/create',status_code=201,
     responses={

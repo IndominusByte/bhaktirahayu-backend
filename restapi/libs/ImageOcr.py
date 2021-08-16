@@ -355,12 +355,12 @@ class ImageOcrKTP(BaseImageOcr):
             print("ADDRESS -> ",(address,address_index))
 
         return {
-            'nik': nik,
-            'name': name,
-            'birth_date': date,
-            'birth_place': birth_place,
-            'gender': gender,
-            'address': address
+            'nik': nik if nik and len(nik) > 1 else None,
+            'name': name if name and len(name) > 1 else None,
+            'birth_date': date if date and len(date) > 1 else None,
+            'birth_place': birth_place if birth_place and len(birth_place) > 1 else None,
+            'gender': gender if gender and len(gender) > 1 else None,
+            'address': address if address and len(address) > 1 else None
         }
 
 class ImageOcrKIS(BaseImageOcr):
@@ -501,9 +501,9 @@ class ImageOcrKIS(BaseImageOcr):
             print("ADDRESS -> ",(address, address_index))
 
         return {
-            'no_card': no_card,
-            'nik': nik,
-            'name': name,
-            'birth_date': date,
-            'address': address
+            'no_card': no_card if no_card and len(no_card) > 1 else None,
+            'nik': nik if nik and len(nik) > 1 else None,
+            'name': name if name and len(name) > 1 else None,
+            'birth_date': date if date and len(date) > 1 else None,
+            'address': address if address and len(address) > 1 else None
         }
