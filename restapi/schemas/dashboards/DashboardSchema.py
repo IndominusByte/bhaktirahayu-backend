@@ -28,3 +28,4 @@ class DasboardChartData(DashboardSchema):
     done_waiting: List[DashboardDoneWaitingData]
     antigen_p_n: List[DashboardPositiveNegativeData]
     genose_p_n: List[DashboardPositiveNegativeData]
+    pcr_p_n: List[DashboardPositiveNegativeData]

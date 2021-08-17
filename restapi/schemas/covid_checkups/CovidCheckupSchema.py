@@ -54,7 +54,7 @@ class CovidCheckupDocumentData(CovidCheckupSchema):
     clients_birth_date: datetime
     clients_gender: Literal['LAKI-LAKI','PEREMPUAN']
     clients_address: str
-    covid_checkups_checking_type: Literal['antigen','genose']
+    covid_checkups_checking_type: Literal['antigen','genose','pcr']
     covid_checkups_check_hash: str
     covid_checkups_check_date: datetime
     covid_checkups_check_result: Literal['positive','negative']
@@ -70,7 +70,7 @@ class CovidCheckupDocumentPdfData(CovidCheckupSchema):
     clients_address: str
     clients_age: int
     covid_checkups_report_number: str
-    covid_checkups_checking_type: Literal['antigen','genose']
+    covid_checkups_checking_type: Literal['antigen','genose','pcr']
     covid_checkups_check_date: datetime
     covid_checkups_check_result: Literal['positive','negative']
     covid_checkups_doctor_username: str

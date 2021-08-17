@@ -7,4 +7,5 @@ institution = Table('institutions', metadata,
     Column('stamp', String(100), nullable=False),
     Column('antigen', String(100), nullable=True),
     Column('genose', String(100), nullable=True),
+    Column('pcr', String(100), nullable=True),
 )

@@ -68,6 +68,16 @@ async def create_institution(form_data: create_form_institution = Depends(), aut
         image_magic.save_image()
         form_data['genose'] = image_magic.file_name
 
+    if pcr := form_data['pcr']:
+        image_magic = MagicImage(
+            file=pcr.file,
+            width=1000,
+            height=200,
+            path_upload='institution/'
+        )
+        image_magic.save_image()
+        form_data['pcr'] = image_magic.file_name
+
     await InstitutionCrud.create_institution(**form_data)
     return {"detail": "Successfully add a new institution."}
 
@@ -119,7 +129,10 @@ async def update_institution(
         if institution['name'] != form_data['name'] and await InstitutionFetch.filter_by_name(form_data['name']):
             raise HTTPException(status_code=400,detail="The name has already been taken.")
 
-        image_in_db = [value for index,value in institution.items() if value and index in ['stamp','antigen','genose']]
+        image_in_db = [
+            value for index,value in institution.items()
+            if value and index in ['stamp','antigen','genose','pcr']
+        ]
         try:
             image_delete = [value for value in form_data['image_delete'] if value in image_in_db]
         except Exception:
@@ -130,9 +143,9 @@ async def update_institution(
 
         if (
             len([x for x in image_in_db if x not in institution['stamp'] and x not in image_delete]) == 0 and
-            form_data['antigen'] is None and form_data['genose'] is None
+            form_data['antigen'] is None and form_data['genose'] is None and form_data['pcr'] is None
         ):
-            raise HTTPException(status_code=422,detail="Upps, at least upload one of antigen or genose.")
+            raise HTTPException(status_code=422,detail="Upps, at least upload one of antigen, genose or pcr.")
 
         if image_delete:
             [MagicImage.delete_image(file=file,path_delete='institution/') for file in image_delete]
@@ -171,8 +184,19 @@ async def update_institution(
             image_magic.save_image()
             form_data['genose'] = image_magic.file_name
 
+        if pcr := form_data['pcr']:
+            MagicImage.delete_image(file=institution['pcr'],path_delete='institution/')
+            image_magic = MagicImage(
+                file=pcr.file,
+                width=1000,
+                height=200,
+                path_upload='institution/'
+            )
+            image_magic.save_image()
+            form_data['pcr'] = image_magic.file_name
+
         # set value in form_data when is value is None and value not in image_delete
-        for value in ['stamp', 'antigen', 'genose']:
+        for value in ['stamp','antigen','genose','pcr']:
             if form_data[value] is None and institution[value] not in image_delete: form_data[value] = institution[value]
 
         await InstitutionCrud.update_institution(
@@ -208,6 +232,7 @@ async def delete_institution(institution_id: int = Path(...,gt=0), authorize: Au
         MagicImage.delete_image(file=institution['stamp'],path_delete='institution/')
         MagicImage.delete_image(file=institution['antigen'],path_delete='institution/')
         MagicImage.delete_image(file=institution['genose'],path_delete='institution/')
+        MagicImage.delete_image(file=institution['pcr'],path_delete='institution/')
         await InstitutionCrud.delete_institution(institution['id'])
         return {"detail": "Successfully delete the institution."}
     raise HTTPException(status_code=404,detail="Institution not found!")

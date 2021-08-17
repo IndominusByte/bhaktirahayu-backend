@@ -22,7 +22,7 @@ def identity_card_ocr_form(
 def get_all_query_client(
     q: str = Query(None,min_length=1),
     gender: Literal['LAKI-LAKI','PEREMPUAN'] = Query(None),
-    checking_type: Literal['antigen','genose'] = Query(None),
+    checking_type: Literal['antigen','genose','pcr'] = Query(None),
     check_result: Literal['positive','negative','empty'] = Query(None),
     doctor_id: str = Query(None,min_length=1,description="Example 1,2,3"),
     guardian_id: str = Query(None,min_length=1,description="Example 1,2,3"),

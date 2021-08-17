@@ -76,7 +76,7 @@ class ClientCrud(ClientSchema):
             raise errors.DatetimeFormatTypeError(type_data=type(v).__name__)
 
 class ClientCreate(ClientCrud):
-    checking_type: Literal['antigen','genose']
+    checking_type: Literal['antigen','genose','pcr']
     institution_id: constr(strict=True, regex=r'^[0-9]*$')
 
     class Config:
@@ -134,7 +134,7 @@ class ClientGetInfoByNik(ClientSchema):
 
 class ClientCovidCheckupData(ClientSchema):
     covid_checkups_id: str
-    covid_checkups_checking_type: Literal['antigen','genose']
+    covid_checkups_checking_type: Literal['antigen','genose','pcr']
     covid_checkups_check_date: Optional[datetime]
     covid_checkups_check_result: Optional[Literal['positive','negative']]
     covid_checkups_doctor_id: Optional[str]
@@ -171,7 +171,7 @@ class ClientExportData(ClientSchema):
     clients_birth_date: datetime
     clients_gender: Literal['LAKI-LAKI','PEREMPUAN']
     clients_address: str
-    covid_checkups_checking_type: Literal['antigen','genose']
+    covid_checkups_checking_type: Literal['antigen','genose','pcr']
     covid_checkups_check_date: Optional[datetime]
     covid_checkups_check_result: Optional[Literal['positive','negative']]
     covid_checkups_doctor_username: Optional[str]

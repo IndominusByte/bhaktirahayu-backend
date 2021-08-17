@@ -21,6 +21,7 @@ class InstitutionAllData(InstitutionData):
     institutions_stamp: str
     institutions_antigen: Optional[str]
     institutions_genose: Optional[str]
+    institutions_pcr: Optional[str]
 
 class InstitutionDataPaginate(InstitutionSchema):
     data: List[InstitutionAllData]

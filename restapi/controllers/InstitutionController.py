@@ -34,6 +34,7 @@ class InstitutionFetch:
         if q := kwargs['q']: query = query.where(institution.c.name.ilike(f"%{q}%"))
         if kwargs['checking_type'] == 'antigen': query = query.where(institution.c.antigen.isnot(None))
         if kwargs['checking_type'] == 'genose': query = query.where(institution.c.genose.isnot(None))
+        if kwargs['checking_type'] == 'pcr': query = query.where(institution.c.pcr.isnot(None))
 
         total = await database.execute(query=select([func.count()]).select_from(query.alias()).as_scalar())
         query = query.limit(kwargs['per_page']).offset((kwargs['page'] - 1) * kwargs['per_page'])

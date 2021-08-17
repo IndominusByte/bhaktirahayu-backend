@@ -59,7 +59,7 @@ async def identity_card_ocr(request: Request, form_data: identity_card_ocr_form 
 async def create_client(client_data: ClientCreate):
     # check institution have genose or antigen
     if institution := await InstitutionFetch.filter_by_id(client_data.institution_id):
-        for kind in ['antigen','genose']:
+        for kind in ['antigen','genose','pcr']:
             if institution[kind] is None and client_data.checking_type == kind:
                 raise HTTPException(status_code=404,detail=f"The institution does not have {kind} checking.")
     else: raise HTTPException(status_code=404,detail="Institution not found!")
@@ -149,8 +149,13 @@ async def update_client(
             raise HTTPException(status_code=400,detail="The phone has already been taken.")
 
         client_data.birth_date = client_data.birth_date.replace(tzinfo=None)
+        # make client identity to uppercase
+        client_identity = {
+            **{k:v.upper() for k,v in client_data.dict(exclude={'birth_date'}).items()},
+            **{'birth_date': client_data.birth_date}
+        }
 
-        await ClientCrud.update_client(client['id'],**client_data.dict())
+        await ClientCrud.update_client(client['id'],**client_identity)
         return {"detail": "Successfully update the client."}
     raise HTTPException(status_code=404,detail="Client not found!")
 

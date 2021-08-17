@@ -37,20 +37,31 @@ def upload_image_genose_optional(genose: Optional[UploadFile] = File(None)):
         max_file_size=5
     )
 
+def upload_image_pcr_optional(pcr: Optional[UploadFile] = File(None)):
+    if not pcr: return
+
+    return validate_single_upload_image(
+        image=pcr,
+        allow_file_ext=['jpg','png','jpeg'],
+        max_file_size=5
+    )
+
 def create_form_institution(
     name: str = Form(...,min_length=3,max_length=100),
     stamp: upload_image_stamp_required = Depends(),
     antigen: upload_image_antigen_optional = Depends(),
-    genose: upload_image_genose_optional = Depends()
+    genose: upload_image_genose_optional = Depends(),
+    pcr: upload_image_pcr_optional = Depends()
 ):
-    if antigen is None and genose is None:
-        raise HTTPException(status_code=422,detail="Upps, at least upload one of antigen or genose.")
+    if antigen is None and genose is None and pcr is None:
+        raise HTTPException(status_code=422,detail="Upps, at least upload one of antigen, genose or pcr.")
 
     return {
         'name': name,
         'stamp': stamp,
         'antigen': antigen,
-        'genose': genose
+        'genose': genose,
+        'pcr': pcr
     }
 
 def update_form_institution(
@@ -58,7 +69,8 @@ def update_form_institution(
     image_delete: str = Form(None,min_length=2,description="Example 1.jpg,2.png,3.jpeg"),
     stamp: upload_image_stamp_optional = Depends(),
     antigen: upload_image_antigen_optional = Depends(),
-    genose: upload_image_genose_optional = Depends()
+    genose: upload_image_genose_optional = Depends(),
+    pcr: upload_image_pcr_optional = Depends()
 ):
     image_delete = parse_str_list(image_delete,",")
     if image_delete and False in [img.endswith(('.jpg','.png','.jpeg')) for img in image_delete]:
@@ -69,14 +81,15 @@ def update_form_institution(
         'image_delete': image_delete,
         'stamp': stamp,
         'antigen': antigen,
-        'genose': genose
+        'genose': genose,
+        'pcr': pcr
     }
 
 def get_all_query_institution(
     page: int = Query(...,gt=0),
     per_page: int = Query(...,gt=0),
     q: str = Query(None,min_length=1),
-    checking_type: Literal['genose','antigen'] = Query(None)
+    checking_type: Literal['genose','antigen','pcr'] = Query(None)
 ):
     return {
         "page": page,

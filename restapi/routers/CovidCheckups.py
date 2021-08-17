@@ -120,16 +120,14 @@ async def get_covid_checkup_by_id(covid_checkup_id: int = Path(...,gt=0), author
 )
 async def preview_document_covid_checkup(
     institution_id: int = Path(...,gt=0),
-    checking_type: Literal['antigen','genose'] = Query(...),
+    checking_type: Literal['antigen','genose','pcr'] = Query(...),
     authorize: AuthJWT = Depends()
 ):
     authorize.jwt_required()
 
     if institution := await InstitutionFetch.filter_by_id(institution_id):
         # check letterhead in institution exists in db
-        institution_letterhead = None
-        if checking_type == 'antigen': institution_letterhead = institution['antigen']
-        if checking_type == 'genose': institution_letterhead = institution['genose']
+        institution_letterhead = institution[checking_type]
 
         if institution_letterhead is None:
             raise HTTPException(
@@ -184,11 +182,8 @@ async def see_document_covid_checkup(covid_checkup_id: int = Path(...,gt=0), aut
 
     if covid_checkup := await CovidCheckupFetch.get_covid_checkup_document(covid_checkup_id):
         # check letterhead in institution exists in db
-        covid_checkups_institution_letterhead = None
-        if covid_checkup['covid_checkups_checking_type'] == 'antigen':
-            covid_checkups_institution_letterhead = covid_checkup['covid_checkups_institution_antigen']
-        if covid_checkup['covid_checkups_checking_type'] == 'genose':
-            covid_checkups_institution_letterhead = covid_checkup['covid_checkups_institution_genose']
+        covid_checkups_institution_letterhead = \
+            covid_checkup['covid_checkups_institution_{}'.format(covid_checkup['covid_checkups_checking_type'])]
 
         if covid_checkups_institution_letterhead is None:
             raise HTTPException(

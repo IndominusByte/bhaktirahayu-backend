@@ -120,7 +120,7 @@ class DashboardFetch:
     @staticmethod
     async def get_all_chart_data(**kwargs) -> dict:
         time_now = datetime.now(tz).replace(tzinfo=None)
-        result = {'done_waiting': [], 'antigen_p_n': [], 'genose_p_n': []}
+        result = {'done_waiting': [], 'antigen_p_n': [], 'genose_p_n': [], 'pcr_p_n': []}
 
         if kwargs['period'] == 'week':
             for i in range(7):
@@ -144,6 +144,14 @@ class DashboardFetch:
                 )
                 result['genose_p_n'].append({
                     'date': days_ago.strftime("%d %b %Y"), 'positive': genose_p, 'negative': genose_n
+                })
+
+                # filter pcr
+                pcr_p, pcr_n = await DashboardLogic.get_positive_negative_chart_data(
+                    **kwargs,kind='week',checking_type='pcr',days_ago=days_ago
+                )
+                result['pcr_p_n'].append({
+                    'date': days_ago.strftime("%d %b %Y"), 'positive': pcr_p, 'negative': pcr_n
                 })
 
         if kwargs['period'] == 'month':
@@ -181,6 +189,16 @@ class DashboardFetch:
                     'negative': genose_n
                 })
 
+                # filter pcr
+                pcr_p, pcr_n = await DashboardLogic.get_positive_negative_chart_data(
+                    **kwargs,kind='month',checking_type='pcr',days_ago=days_ago,days_now=days_now
+                )
+                result['pcr_p_n'].append({
+                    'date': '{} - {}'.format(days_ago.strftime("%d %b %Y"),days_now.strftime("%d %b %Y")),
+                    'positive': pcr_p,
+                    'negative': pcr_n
+                })
+
         if kwargs['period'] == 'year':
             for i in range(1,13):
                 days_ago = time_now - timedelta(days=i * 30)
@@ -214,6 +232,16 @@ class DashboardFetch:
                     'date': '{} - {}'.format(days_ago.strftime("%d %b %Y"),days_now.strftime("%d %b %Y")),
                     'positive': genose_p,
                     'negative': genose_n
+                })
+
+                # filter pcr
+                pcr_p, pcr_n = await DashboardLogic.get_positive_negative_chart_data(
+                    **kwargs,kind='year',checking_type='pcr',days_ago=days_ago,days_now=days_now
+                )
+                result['pcr_p_n'].append({
+                    'date': '{} - {}'.format(days_ago.strftime("%d %b %Y"),days_now.strftime("%d %b %Y")),
+                    'positive': pcr_p,
+                    'negative': pcr_n
                 })
 
         return result
