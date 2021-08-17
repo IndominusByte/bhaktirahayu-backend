@@ -70,8 +70,14 @@ async def update_covid_checkup(
         covid_checkup_data.check_date = covid_checkup_data.check_date.replace(tzinfo=None)
         additional_data = dict()
 
-        # save qrcode if check_hash is None
-        if covid_checkup['check_hash'] is None:
+        # save qrcode if check_hash is None or qrcode has deleted
+        if (
+            covid_checkup['check_hash'] is None or
+            (
+                covid_checkup['check_hash'] is not None and
+                MagicImage.check_file_exist('qrcode/{}.png'.format(covid_checkup['check_hash'])) is False
+            )
+        ):
             qrcode_hash = uuid4().hex
             additional_data.update({'check_hash': qrcode_hash})
             generate_qr_code(
@@ -204,6 +210,11 @@ async def see_document_covid_checkup(covid_checkup_id: int = Path(...,gt=0), aut
         now_year = datetime.now(tz).strftime("%Y")
         client_age = int(now_year) - int(client_year)
 
+        # get qrcode
+        if MagicImage.check_file_exist('qrcode/{}.png'.format(covid_checkup['covid_checkups_check_hash'])) is True:
+            qrcode_png = covid_checkup['covid_checkups_check_hash'] + '.png'
+        else: qrcode_png = 'qrcode.png'
+
         # get data required
         institution_data = {
             **{
@@ -222,7 +233,7 @@ async def see_document_covid_checkup(covid_checkup_id: int = Path(...,gt=0), aut
                 if k in ['covid_checkups_check_result', 'covid_checkups_check_date', 'covid_checkups_checking_type']
             },
             **{
-                'covid_checkups_check_qrcode': covid_checkup['covid_checkups_check_hash'] + '.png',
+                'covid_checkups_check_qrcode': qrcode_png,
                 'covid_checkups_report_number': report_number
             }
         }

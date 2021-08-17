@@ -229,6 +229,10 @@ class MagicImage:
                 return base64.b64encode(f.read()).decode('utf-8')
 
     @classmethod
+    def check_file_exist(cls,path_file: str) -> bool:
+        return os.path.exists(os.path.join(cls.base_dir,path_file or ' '))
+
+    @classmethod
     def delete_image(cls,file: str, path_delete: str) -> None:
         path = os.path.join(cls.base_dir,path_delete,file or ' ')
         if os.path.exists(path):
