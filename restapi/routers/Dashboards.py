@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends
+import asyncio
+from fastapi import APIRouter, Depends, WebSocket
 from fastapi_jwt_auth import AuthJWT
 from controllers.DashboardController import DashboardFetch
 from schemas.dashboards.DashboardSchema import DashboardTotalData, DasboardChartData
@@ -20,3 +21,14 @@ async def chart_data_dashboard(
     authorize.jwt_required()
 
     return await DashboardFetch.get_all_chart_data(**query_string)
+
+@router.websocket('/ws-server-info')
+async def websocket_server_info(websocket: WebSocket):
+    dashboard = websocket.app.state.dashboard
+    try:
+        await dashboard.connect(websocket)
+        while len(dashboard.active_connections) > 0:
+            await dashboard.broadcast_server_info()
+            await asyncio.sleep(2)
+    except Exception:
+        await dashboard.disconnect(websocket,'websocket')

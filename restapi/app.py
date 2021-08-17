@@ -13,6 +13,7 @@ from config import database, redis_conn, settings
 from libs.ImageOcr import ImageOcrKTP, ImageOcrKIS
 from libs.NikExtraction import NikExtraction
 from libs.ClearData import clear_qrcode_expired
+from libs.ConnectionManager import ConnectionDashboard
 from routers import (
     Users, Guardians, LocationServices,
     Institutions, Clients, CovidCheckups,
@@ -48,6 +49,9 @@ async def startup():
     app.state.ocr_ktp = ImageOcrKTP()
     # set ktp nik extraction
     app.state.nik_extraction = NikExtraction()
+    # set connection websocket
+    dashboard = ConnectionDashboard()
+    app.state.dashboard = dashboard
 
 @app.on_event("startup")
 @repeat_every(seconds=24 * 3600)  # every 24 hours

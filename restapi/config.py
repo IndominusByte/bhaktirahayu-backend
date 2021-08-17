@@ -43,6 +43,8 @@ class Settings(BaseSettings):
 
     timezone: str
     stage_app: Literal['production','development']
+    vps_expired: str
+    domain_expired: str
     nik_area_code_data: list = nik_area_code_list
 
     access_expires: Optional[int] = None
