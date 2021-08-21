@@ -3,6 +3,7 @@ from copy import deepcopy
 from sqlalchemy.sql import select
 from config import database
 from models.UserModel import user
+from models.GuardianModel import guardian
 
 class OperationTest:
     name = 'testtesttttttt'
@@ -13,6 +14,8 @@ class OperationTest:
     base_dir = os.path.join(os.path.dirname(__file__),'../static/')
     test_image_dir = base_dir + 'test_image/'
     signature_dir = base_dir + 'signature/'
+
+    # ================ USER SECTION ================
 
     @pytest.mark.asyncio
     async def create_user(self, **kwargs):
@@ -42,3 +45,10 @@ class OperationTest:
         # delete user 2
         query = user.delete().where(user.c.email == self.account_2['email'])
         await database.execute(query=query)
+
+    # ================ GUARDIAN SECTION ================
+
+    @pytest.mark.asyncio
+    async def get_guardian_id(self,name: str):
+        guardian_data = await database.fetch_one(query=select([guardian]).where(guardian.c.name == name))
+        return guardian_data['id']
