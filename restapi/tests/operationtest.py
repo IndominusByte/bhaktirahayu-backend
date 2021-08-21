@@ -5,6 +5,7 @@ from config import database
 from models.UserModel import user
 from models.GuardianModel import guardian
 from models.LocationServiceModel import location_service
+from models.InstitutionModel import institution
 
 class OperationTest:
     name = 'testtesttttttt'
@@ -15,6 +16,7 @@ class OperationTest:
     base_dir = os.path.join(os.path.dirname(__file__),'../static/')
     test_image_dir = base_dir + 'test_image/'
     signature_dir = base_dir + 'signature/'
+    institution_dir = base_dir + 'institution/'
 
     # ================ USER SECTION ================
 
@@ -62,3 +64,20 @@ class OperationTest:
             query=select([location_service]).where(location_service.c.name == name)
         )
         return location_service_data['id']
+
+    # ================ INSTITUTION SECTION ================
+
+    @pytest.mark.asyncio
+    async def get_institution_id(self,name: str):
+        institution_data = await database.fetch_one(query=select([institution]).where(institution.c.name == name))
+        return institution_data['id']
+
+    @pytest.mark.asyncio
+    async def get_institution_image(self,name: str):
+        institution_data = await database.fetch_one(query=select([institution]).where(institution.c.name == name))
+        return {
+            'stamp': institution_data['stamp'],
+            'antigen': institution_data['antigen'],
+            'genose': institution_data['genose'],
+            'pcr': institution_data['pcr']
+        }
