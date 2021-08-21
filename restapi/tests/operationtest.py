@@ -4,6 +4,7 @@ from sqlalchemy.sql import select
 from config import database
 from models.UserModel import user
 from models.GuardianModel import guardian
+from models.LocationServiceModel import location_service
 
 class OperationTest:
     name = 'testtesttttttt'
@@ -52,3 +53,12 @@ class OperationTest:
     async def get_guardian_id(self,name: str):
         guardian_data = await database.fetch_one(query=select([guardian]).where(guardian.c.name == name))
         return guardian_data['id']
+
+    # ================ LOCATION-SERVICE SECTION ================
+
+    @pytest.mark.asyncio
+    async def get_location_service_id(self,name: str):
+        location_service_data = await database.fetch_one(
+            query=select([location_service]).where(location_service.c.name == name)
+        )
+        return location_service_data['id']
