@@ -6,6 +6,7 @@ from models.UserModel import user
 from models.GuardianModel import guardian
 from models.LocationServiceModel import location_service
 from models.InstitutionModel import institution
+from models.ClientModel import client
 
 class OperationTest:
     name = 'testtesttttttt'
@@ -81,3 +82,14 @@ class OperationTest:
             'genose': institution_data['genose'],
             'pcr': institution_data['pcr']
         }
+
+    # ================ CLIENT SECTION ================
+    @pytest.mark.asyncio
+    async def get_client_data(self,nik: str):
+        client_data = await database.fetch_one(query=select([client]).where(client.c.nik == nik))
+        return {k:v for k,v in client_data.items()}
+
+    @pytest.mark.asyncio
+    async def get_client_id(self,nik: str):
+        client_data = await database.fetch_one(query=select([client]).where(client.c.nik == nik))
+        return client_data['id']

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Path, Query, Depends, HTTPException
+from fastapi import APIRouter, Request, Response, Path, Query, Depends, HTTPException
 from fastapi_jwt_auth import AuthJWT
 from controllers.CovidCheckupController import CovidCheckupCrud, CovidCheckupLogic
 from controllers.ClientController import ClientCrud, ClientFetch
@@ -56,8 +56,8 @@ async def identity_card_ocr(request: Request, form_data: identity_card_ocr_form 
         }
     }
 )
-async def create_client(client_data: ClientCreate):
-    # check institution have genose or antigen
+async def create_client(client_data: ClientCreate, response: Response):
+    # check institution have antigen, genose, or pcr
     if institution := await InstitutionFetch.filter_by_id(client_data.institution_id):
         for kind in ['antigen','genose','pcr']:
             if institution[kind] is None and client_data.checking_type == kind:
@@ -93,6 +93,7 @@ async def create_client(client_data: ClientCreate):
 
         await ClientCrud.update_client(client['id'],**client_identity)
         await CovidCheckupCrud.create_covid_checkup(client_id=client['id'],**covid_checkup_data)
+        response.status_code = 200
     else:
         client_id = await ClientCrud.create_client(**client_identity)
         await CovidCheckupCrud.create_covid_checkup(client_id=client_id,**covid_checkup_data)
