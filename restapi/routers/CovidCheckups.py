@@ -81,7 +81,7 @@ async def update_covid_checkup(
             qrcode_hash = uuid4().hex
             additional_data.update({'check_hash': qrcode_hash})
             generate_qr_code(
-                data=f"{settings.frontend_uri}/covid_checkups/validate-document/{qrcode_hash}",
+                data=f"{settings.frontend_uri}/covid-checkups/validate-document/{qrcode_hash}",
                 filename=f"{qrcode_hash}.png"
             )
 
