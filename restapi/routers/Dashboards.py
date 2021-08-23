@@ -1,5 +1,5 @@
 import asyncio
-from fastapi import APIRouter, Depends, WebSocket
+from fastapi import APIRouter, Depends, Query, WebSocket
 from fastapi_jwt_auth import AuthJWT
 from controllers.DashboardController import DashboardFetch
 from schemas.dashboards.DashboardSchema import DashboardTotalData, DasboardChartData
@@ -23,12 +23,14 @@ async def chart_data_dashboard(
     return await DashboardFetch.get_all_chart_data(**query_string)
 
 @router.websocket('/ws-server-info')
-async def websocket_server_info(websocket: WebSocket):
+async def websocket_server_info(websocket: WebSocket, user_hash: str = Query(...,min_length=1)):
     dashboard = websocket.app.state.dashboard
     try:
-        await dashboard.connect(websocket)
+        await dashboard.connect(websocket,user_hash)
         while len(dashboard.active_connections) > 0:
-            await dashboard.broadcast_server_info()
-            await asyncio.sleep(2)
+            msg_data = await websocket.receive()
+            if text := msg_data.get('text'):
+                if 'send~' in text:
+                    await dashboard.send_server_info(user_hash=text.split('~')[-1])
     except Exception:
         await dashboard.disconnect(websocket,'websocket')

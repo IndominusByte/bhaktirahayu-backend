@@ -11,13 +11,14 @@ tz = timezone(settings.timezone)
 logger = logging.getLogger("uvicorn.info")
 
 class ConnectionManager:
-    async def connect(self, websocket: WebSocket):
+    async def connect(self, websocket: WebSocket, user_hash: str):
         await websocket.accept()
 
         # set state to websocket
         user_agent = websocket.headers.get('user-agent')
         websocket.state.device = str(parse(user_agent))
         websocket.state.ip = websocket.client.host
+        websocket.state.user_hash = user_hash
 
         # remove all duplicate connection
         for connection in self.active_connections:
@@ -28,7 +29,8 @@ class ConnectionManager:
 
     def check_duplicate_connection(self, connection: WebSocket, websocket: WebSocket) -> bool:
         return connection.state.device == websocket.state.device and \
-            connection.state.ip == websocket.state.ip
+            connection.state.ip == websocket.state.ip and \
+            connection.state.user_hash == websocket.state.user_hash
 
     async def send_data(self, kind: str, connection: WebSocket, data: Union[str, bytes]) -> None:
         try:
@@ -127,7 +129,7 @@ class ConnectionDashboard(ConnectionManager):
             }
         }
 
-    async def broadcast_server_info(self) -> None:
+    async def send_server_info(self, user_hash: str) -> None:
         cpu_info = self.get_cpu_server_info()
         ram_info = self.get_ram_server_info()
         disk_info = self.get_disk_server_info()
@@ -138,7 +140,5 @@ class ConnectionDashboard(ConnectionManager):
             'disk_info': disk_info, 'expired_info': expired_info
         }
 
-        [
-            await self.send_data('text', connection, json.dumps(result,default=str))
-            for connection in self.active_connections
-        ]
+        user_connect = next(filter(lambda x: x.state.user_hash == user_hash, self.active_connections))
+        await self.send_data('text', user_connect, json.dumps(result,default=str))
