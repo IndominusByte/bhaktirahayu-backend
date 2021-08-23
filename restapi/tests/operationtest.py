@@ -7,6 +7,7 @@ from models.GuardianModel import guardian
 from models.LocationServiceModel import location_service
 from models.InstitutionModel import institution
 from models.ClientModel import client
+from models.CovidCheckupModel import covid_checkup
 
 class OperationTest:
     name = 'testtesttttttt'
@@ -18,6 +19,7 @@ class OperationTest:
     test_image_dir = base_dir + 'test_image/'
     signature_dir = base_dir + 'signature/'
     institution_dir = base_dir + 'institution/'
+    qrcode_dir = base_dir + 'qrcode/'
 
     # ================ USER SECTION ================
 
@@ -84,6 +86,7 @@ class OperationTest:
         }
 
     # ================ CLIENT SECTION ================
+
     @pytest.mark.asyncio
     async def get_client_data(self,nik: str):
         client_data = await database.fetch_one(query=select([client]).where(client.c.nik == nik))
@@ -93,3 +96,23 @@ class OperationTest:
     async def get_client_id(self,nik: str):
         client_data = await database.fetch_one(query=select([client]).where(client.c.nik == nik))
         return client_data['id']
+
+    # ================ COVID-CHECKUP SECTION ================
+
+    @pytest.mark.asyncio
+    async def get_covid_checkup_data(self,client_id: int):
+        covid_checkup_data = await database.fetch_one(query=select([covid_checkup])
+            .where(covid_checkup.c.client_id == client_id)
+        )
+        return {k:v for k,v in covid_checkup_data.items()}
+
+    @pytest.mark.asyncio
+    async def get_covid_checkup_id(self,client_id: int):
+        covid_checkup_data = await database.fetch_one(query=select([covid_checkup])
+            .where(covid_checkup.c.client_id == client_id)
+        )
+        return covid_checkup_data['id']
+
+    @pytest.mark.asyncio
+    async def update_covid_checkup(self,id_: int, **kwargs):
+        await database.execute(query=covid_checkup.update().where(covid_checkup.c.id == id_),values=kwargs)
