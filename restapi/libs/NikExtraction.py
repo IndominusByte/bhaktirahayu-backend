@@ -23,7 +23,7 @@ class NikExtraction:
     def gender_checker(self, gender_num: int) -> str:
         if gender_num in [0, 1, 2, 3]:
             return 'LAKI-LAKI'
-        if gender_num in [4, 5, 6]:
+        if gender_num in [4, 5, 6, 7]:
             return 'PEREMPUAN'
         return None
 
@@ -59,7 +59,7 @@ class NikExtraction:
             province, district, subdistrict = None, None, None
             gender, birth_date = None, None
 
-        valid = valid is True and gender is not None and birth_date is not None
+        valid = valid is True and location_valid is True and birth_date is not None
 
         return {
             'nik': nik_number,
