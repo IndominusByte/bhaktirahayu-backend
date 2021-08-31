@@ -46,6 +46,7 @@ services:
       - HEALTHCHECK_PORT=80
   pgadmin4:
     image: "dpage/pgadmin4"
+    restart: always
     ports: 
       - "0.0.0.0:5437:80"
     environment:
@@ -53,6 +54,7 @@ services:
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
   redis-server:
     image: "redis"
+    restart: always
     sysctls:
       - net.core.somaxconn=511
 
