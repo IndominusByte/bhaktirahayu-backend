@@ -14,6 +14,10 @@ tz = timezone(settings.timezone)
 
 class CovidCheckupLogic:
     @staticmethod
+    async def get_max_id() -> int:
+        return await database.execute(query=select([func.max(covid_checkup.c.id)])) or 0
+
+    @staticmethod
     async def covid_checkup_on_same_date_and_institution(
         checking_type: str,
         institution_id: int,
@@ -34,7 +38,8 @@ class CovidCheckupLogic:
 class CovidCheckupCrud:
     @staticmethod
     async def create_covid_checkup(**kwargs) -> int:
-        return await database.execute(query=covid_checkup.insert(),values=kwargs)
+        kwargs.update({'id': await CovidCheckupLogic.get_max_id() + 1})
+        return await database.execute(query=covid_checkup.insert(),values=kwargs) or kwargs['id']
 
     @staticmethod
     async def update_covid_checkup(id_: int, **kwargs) -> None:

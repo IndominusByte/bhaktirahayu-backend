@@ -10,12 +10,16 @@ class UserLogic:
     def password_is_same_as_hash(password: str, password_db: str) -> bool:
         return bcrypt.checkpw(password.encode(),password_db.encode())
 
+    @staticmethod
+    async def get_max_id() -> int:
+        return await database.execute(query=select([func.max(user.c.id)])) or 0
+
 class UserCrud:
     @staticmethod
     async def create_user(**kwargs) -> int:
         hashed_pass = bcrypt.hashpw(kwargs['password'].encode(), bcrypt.gensalt())
-        kwargs.update({'password': hashed_pass.decode('utf-8')})
-        return await database.execute(query=user.insert(),values=kwargs)
+        kwargs.update({'id': await UserLogic.get_max_id() + 1, 'password': hashed_pass.decode('utf-8')})
+        return await database.execute(query=user.insert(),values=kwargs) or kwargs['id']
 
     @staticmethod
     async def update_password_user(id_: int, password: str) -> None:

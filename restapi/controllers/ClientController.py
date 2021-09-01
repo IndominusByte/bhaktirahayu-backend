@@ -11,6 +11,10 @@ from typing import Union
 
 class ClientLogic:
     @staticmethod
+    async def get_max_id() -> int:
+        return await database.execute(query=select([func.max(client.c.id)])) or 0
+
+    @staticmethod
     def export_client_covid_checkup(client_data: list) -> list:
         index, result = 1, []
         exclude_client_data = ['clients_id','clients_created_at','clients_updated_at','covid_checkups']
@@ -34,7 +38,8 @@ class ClientLogic:
 class ClientCrud:
     @staticmethod
     async def create_client(**kwargs) -> int:
-        return await database.execute(query=client.insert(),values=kwargs)
+        kwargs.update({'id': await ClientLogic.get_max_id() + 1})
+        return await database.execute(query=client.insert(),values=kwargs) or kwargs['id']
 
     @staticmethod
     async def update_client(id_: int, **kwargs) -> None:

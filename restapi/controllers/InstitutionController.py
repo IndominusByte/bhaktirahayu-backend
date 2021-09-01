@@ -4,12 +4,15 @@ from models.InstitutionModel import institution
 from libs.Pagination import Pagination
 
 class InstitutionLogic:
-    pass
+    @staticmethod
+    async def get_max_id() -> int:
+        return await database.execute(query=select([func.max(institution.c.id)])) or 0
 
 class InstitutionCrud:
     @staticmethod
     async def create_institution(**kwargs) -> int:
-        return await database.execute(query=institution.insert(),values=kwargs)
+        kwargs.update({'id': await InstitutionLogic.get_max_id() + 1})
+        return await database.execute(query=institution.insert(),values=kwargs) or kwargs['id']
 
     @staticmethod
     async def update_institution(id_: int, **kwargs) -> None:

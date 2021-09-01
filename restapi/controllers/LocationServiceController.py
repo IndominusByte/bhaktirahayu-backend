@@ -4,12 +4,15 @@ from libs.Pagination import Pagination
 from models.LocationServiceModel import location_service
 
 class LocationServiceLogic:
-    pass
+    @staticmethod
+    async def get_max_id() -> int:
+        return await database.execute(query=select([func.max(location_service.c.id)])) or 0
 
 class LocationServiceCrud:
     @staticmethod
     async def create_location_service(name: str) -> int:
-        return await database.execute(query=location_service.insert(),values={'name': name})
+        kwargs = {'id': await LocationServiceLogic.get_max_id() + 1,'name': name}
+        return await database.execute(query=location_service.insert(),values=kwargs) or kwargs['id']
 
     @staticmethod
     async def update_location_service(id_: str, **kwargs) -> None:
