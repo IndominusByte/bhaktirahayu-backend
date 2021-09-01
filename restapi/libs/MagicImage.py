@@ -24,7 +24,11 @@ def validate_multiple_upload_images(
                 row_hash, col_hash = dhash.dhash_row_col(img,size=17)
                 image_hash.append(dhash.format_hex(row_hash,col_hash))
 
-                if img.format.lower() not in allow_file_ext and img.mode != 'RGB':
+                if (
+                    (img.format.lower() not in allow_file_ext) or
+                    (img.format.lower() not in allow_file_ext and img.mode != 'RGB')
+                ):
+
                     msg = "The image at index {index} must be between {extension}."
                     ctx = {'index': index, 'extension': ', '.join(allow_file_ext)}
                     raise HTTPException(status_code=422,detail=msg.format(**ctx))
@@ -68,7 +72,10 @@ def validate_single_upload_image(
     # validation image
     try:
         with Image.open(image.file) as img:
-            if img.format.lower() not in allow_file_ext and img.mode != 'RGB':
+            if (
+                (img.format.lower() not in allow_file_ext) or
+                (img.format.lower() not in allow_file_ext and img.mode != 'RGB')
+            ):
                 msg = "Image must be between {extension}."
                 ctx = {'extension': ', '.join(allow_file_ext)}
                 raise HTTPException(status_code=422,detail=msg.format(**ctx))

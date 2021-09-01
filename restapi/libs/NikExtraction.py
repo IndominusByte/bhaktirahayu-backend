@@ -59,7 +59,7 @@ class NikExtraction:
             province, district, subdistrict = None, None, None
             gender, birth_date = None, None
 
-        valid = valid is True and location_valid is True and birth_date is not None
+        valid = valid is True and location_valid is True
 
         return {
             'nik': nik_number,

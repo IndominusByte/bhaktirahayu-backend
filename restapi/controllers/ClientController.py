@@ -161,11 +161,6 @@ class ClientFetch:
             return ClientLogic.export_client_covid_checkup(client_data)
 
     @staticmethod
-    async def filter_by_phone(phone: int) -> client:
-        query = select([client]).where(client.c.phone == phone)
-        return await database.fetch_one(query=query)
-
-    @staticmethod
     async def filter_by_id(id_: int) -> client:
         query = select([client]).where(client.c.id == id_)
         return await database.fetch_one(query=query)

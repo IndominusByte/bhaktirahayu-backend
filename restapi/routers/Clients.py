@@ -47,8 +47,8 @@ async def identity_card_ocr(request: Request, form_data: identity_card_ocr_form 
             "content": {"application/json":{"example": {"detail": "Successfully registration."}}}
         },
         400: {
-            "description": "Cannot register many times or Phone exists in db",
-            "content": {"application/json":{"example": {"detail": "string"}}}
+            "description": "Cannot register many times",
+            "content": {"application/json":{"example": {"detail": "You cannot register many times at the same institute, please try again after 1 hour."}}}
         },
         404: {
             "description": "Institution not found or Institution does not have antigen/genose",
@@ -63,11 +63,6 @@ async def create_client(client_data: ClientCreate, response: Response):
             if institution[kind] is None and client_data.checking_type == kind:
                 raise HTTPException(status_code=404,detail=f"The institution does not have {kind} checking.")
     else: raise HTTPException(status_code=404,detail="Institution not found!")
-
-    # check phone number exists
-    if client := await ClientFetch.filter_by_phone(client_data.phone):
-        if client['nik'] != client_data.nik:
-            raise HTTPException(status_code=400,detail="The phone number has already been taken.")
 
     client_data.birth_date = client_data.birth_date.replace(tzinfo=None)
     # make client identity to uppercase
@@ -127,8 +122,8 @@ async def get_all_clients_export(query_string: get_all_query_client_export = Dep
             "content": {"application/json":{"example": {"detail": "Successfully update the client."}}}
         },
         400: {
-            "description": "Nik or Phone already taken",
-            "content": {"application/json":{"example": {"detail": "string"}}}
+            "description": "Nik already taken",
+            "content": {"application/json":{"example": {"detail": "The nik has already been taken."}}}
         },
         404: {
             "description": "Client not found",
@@ -146,8 +141,6 @@ async def update_client(
     if client := await ClientFetch.filter_by_id(client_id):
         if client['nik'] != client_data.nik and await ClientFetch.filter_by_nik(client_data.nik):
             raise HTTPException(status_code=400,detail="The nik has already been taken.")
-        if client['phone'] != client_data.phone and await ClientFetch.filter_by_phone(client_data.phone):
-            raise HTTPException(status_code=400,detail="The phone has already been taken.")
 
         client_data.birth_date = client_data.birth_date.replace(tzinfo=None)
         # make client identity to uppercase

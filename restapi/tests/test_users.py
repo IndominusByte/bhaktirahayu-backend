@@ -312,9 +312,9 @@ class TestUser(OperationTest):
         with open(self.test_image_dir + 'test.gif','rb') as tmp:
             response = client.put(url,files={'image': tmp})
             assert response.status_code == 422
-            assert response.json() == {'detail': 'Image must be between jpg, png, jpeg.'}
+            assert response.json() == {'detail': 'Image must be between png.'}
         # file cannot grater than 5 Mb
-        with open(self.test_image_dir + 'size.jpeg','rb') as tmp:
+        with open(self.test_image_dir + 'size.png','rb') as tmp:
             response = client.put(url,files={'image': tmp})
             assert response.status_code == 413
             assert response.json() == {'detail':'An image cannot greater than 5 Mb.'}
@@ -331,7 +331,7 @@ class TestUser(OperationTest):
         url = self.prefix + '/update-account'
 
         # only doctor can upload signature
-        with open(self.test_image_dir + 'image.jpeg','rb') as tmp:
+        with open(self.signature_dir + 'signature.png','rb') as tmp:
             response = await async_client.put(url,
                 data={'email': self.account_admin['email'], 'username': self.account_admin['username']},
                 files={'image': tmp},
@@ -363,7 +363,7 @@ class TestUser(OperationTest):
         csrf_access_token = response.cookies.get('csrf_access_token')
 
         # doctor update signature
-        with open(self.test_image_dir + 'image.jpeg','rb') as tmp:
+        with open(self.signature_dir + 'signature.png','rb') as tmp:
             response = await async_client.put(url,
                 data={'email': self.account_1['email'], 'username': self.account_1['username']},
                 files={'image': tmp},
@@ -433,9 +433,9 @@ class TestUser(OperationTest):
         with open(self.test_image_dir + 'test.gif','rb') as tmp:
             response = client.post(url,files={'image': tmp})
             assert response.status_code == 422
-            assert response.json() == {'detail': 'Image must be between jpg, png, jpeg.'}
+            assert response.json() == {'detail': 'Image must be between png.'}
         # file cannot grater than 5 Mb
-        with open(self.test_image_dir + 'size.jpeg','rb') as tmp:
+        with open(self.test_image_dir + 'size.png','rb') as tmp:
             response = client.post(url,files={'image': tmp})
             assert response.status_code == 413
             assert response.json() == {'detail':'An image cannot greater than 5 Mb.'}
@@ -450,7 +450,7 @@ class TestUser(OperationTest):
 
         url = self.prefix + '/create-doctor'
         # check user is admin
-        with open(self.test_image_dir + 'image.jpeg','rb') as tmp:
+        with open(self.signature_dir + 'signature.png','rb') as tmp:
             response = await async_client.post(url,
                 data={'email': self.account_2['email'], 'username': self.account_2['username']},
                 files={'image': tmp},
@@ -467,7 +467,7 @@ class TestUser(OperationTest):
         csrf_access_token = response.cookies.get('csrf_access_token')
 
         # check email duplicate
-        with open(self.test_image_dir + 'image.jpeg','rb') as tmp:
+        with open(self.signature_dir + 'signature.png','rb') as tmp:
             response = await async_client.post(url,
                 data={'email': self.account_1['email'], 'username': self.account_1['username']},
                 files={'image': tmp},
@@ -476,7 +476,7 @@ class TestUser(OperationTest):
             assert response.status_code == 400
             assert response.json() == {"detail": "The email has already been taken."}
 
-        with open(self.test_image_dir + 'image.jpeg','rb') as tmp:
+        with open(self.signature_dir + 'signature.png','rb') as tmp:
             response = await async_client.post(url,
                 data={'email': self.account_2['email'], 'username': self.account_2['username']},
                 files={'image': tmp},
@@ -678,9 +678,9 @@ class TestUser(OperationTest):
         with open(self.test_image_dir + 'test.gif','rb') as tmp:
             response = client.put(url + '1',files={'image': tmp})
             assert response.status_code == 422
-            assert response.json() == {'detail': 'Image must be between jpg, png, jpeg.'}
+            assert response.json() == {'detail': 'Image must be between png.'}
         # file cannot grater than 5 Mb
-        with open(self.test_image_dir + 'size.jpeg','rb') as tmp:
+        with open(self.test_image_dir + 'size.png','rb') as tmp:
             response = client.put(url + '1',files={'image': tmp})
             assert response.status_code == 413
             assert response.json() == {'detail':'An image cannot greater than 5 Mb.'}
@@ -740,7 +740,7 @@ class TestUser(OperationTest):
         assert response.status_code == 200
         assert response.json() == {"detail": "Successfully update the doctor."}
 
-        with open(self.test_image_dir + 'image.jpeg','rb') as tmp:
+        with open(self.signature_dir + 'signature.png','rb') as tmp:
             response = await async_client.put(url + str(user_id),
                 data={'email': self.account_2['email'], 'username': self.account_2['username']},
                 files={'image': tmp},

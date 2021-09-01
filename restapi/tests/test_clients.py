@@ -356,25 +356,6 @@ class TestClient(OperationTest):
         assert response.status_code == 200
         assert response.json() == {"detail": "Successfully registration."}
 
-    @pytest.mark.asyncio
-    async def test_phone_duplicate_create_client(self,async_client):
-        url = self.prefix + '/create'
-
-        institution_id = await self.get_institution_id(self.name)
-        response = await async_client.post(url,json={
-            "nik": "5171010609990002",
-            "name": "paulus bonatua simanjuntak",
-            "birth_place": "denpasar",
-            "birth_date": "22-08-2021",
-            "gender": "LAKI-LAKI",
-            "phone": "+62 87862265363",
-            "address": "denpasar",
-            "checking_type": "antigen",
-            "institution_id": str(institution_id)
-        })
-        assert response.status_code == 400
-        assert response.json() == {"detail": "The phone number has already been taken."}
-
         # create another client
         institution_id = await self.get_institution_id(self.name)
         response = await async_client.post(url,json={
@@ -791,18 +772,6 @@ class TestClient(OperationTest):
         },headers={'X-CSRF-TOKEN': csrf_access_token})
         assert response.status_code == 400
         assert response.json() == {"detail": "The nik has already been taken."}
-        # phone already taken
-        response = await async_client.put(url + str(client_id),json={
-            "nik": "5103051905990006",
-            "name": "NYOMAN PRADIPTA DEWANTARA",
-            "birth_place": "BALIKPAPAN",
-            "birth_date": "22-08-2021",
-            "gender": "LAKI-LAKI",
-            "phone": "+62 87862265362",
-            "address": "PURIGADING"
-        },headers={'X-CSRF-TOKEN': csrf_access_token})
-        assert response.status_code == 400
-        assert response.json() == {"detail": "The phone has already been taken."}
 
         response = await async_client.put(url + str(client_id),json={
             "nik": "5103051905990006",

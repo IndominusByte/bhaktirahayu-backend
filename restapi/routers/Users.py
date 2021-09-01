@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Path, Depends, HTTPException
 from fastapi_jwt_auth import AuthJWT
 from controllers.UserController import UserFetch, UserCrud, UserLogic
-from dependencies.UserDependant import create_form_doctor, update_form_user, get_all_query_doctor
+from dependencies.UserDependant import create_form_doctor, update_form_doctor, get_all_query_doctor
 from schemas.users.UserSchema import (
     UserData, UserLogin,
     UserUpdatePassword, UserDoctorPaginate,
@@ -158,7 +158,7 @@ async def update_password(user_data: UserUpdatePassword, authorize: AuthJWT = De
         }
     }
 )
-async def update_account(form_data: update_form_user = Depends(), authorize: AuthJWT = Depends()):
+async def update_account(form_data: update_form_doctor = Depends(), authorize: AuthJWT = Depends()):
     authorize.jwt_required()
 
     user_id = int(authorize.get_jwt_subject())
@@ -309,7 +309,7 @@ async def reset_password_doctor(doctor_id: int = Path(...,gt=0), authorize: Auth
 )
 async def update_doctor(
     doctor_id: int = Path(...,gt=0),
-    form_data: update_form_user = Depends(),
+    form_data: update_form_doctor = Depends(),
     authorize: AuthJWT = Depends()
 ):
     authorize.jwt_required()
