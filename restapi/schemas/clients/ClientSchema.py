@@ -77,7 +77,7 @@ class ClientCrud(ClientSchema):
 
     @validator('birth_date')
     def validate_birth_date(cls, v):
-        if v > datetime.now(tz):
+        if v.date() >= datetime.now(tz).date():
             raise errors.BirthDateNotGtError()
         return v
 
