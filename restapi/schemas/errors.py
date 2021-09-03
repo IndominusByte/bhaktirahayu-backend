@@ -24,3 +24,9 @@ class PhoneNumberError(PydanticValueError):
 class PasswordConfirmError(PydanticValueError):
     code = 'password_confirm'
     msg_template = 'password must match with password confirmation'
+
+# ========= CLIENT SECTION =========
+
+class BirthDateNotGtError(PydanticValueError):
+    code = 'birth_date.not_gt'
+    msg_template = 'the birth date cannot greater than the current time now'

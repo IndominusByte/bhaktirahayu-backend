@@ -1,6 +1,12 @@
 import pytest
 from pathlib import Path
 from .operationtest import OperationTest
+from datetime import datetime, timedelta
+from pytz import timezone
+from config import settings
+
+tz = timezone(settings.timezone)
+tf = '%d-%m-%Y'
 
 class TestClient(OperationTest):
     prefix = "/clients"
@@ -243,6 +249,11 @@ class TestClient(OperationTest):
         assert response.status_code == 422
         for x in response.json()['detail']:
             if x['loc'][-1] == 'birth_date': assert x['msg'] == "time data 'asd' does not match format '%d-%m-%Y'"
+        # check birth_date not greater than current time
+        response = client.post(url,json={'birth_date': format(datetime.now(tz) + timedelta(days=1),tf)})
+        assert response.status_code == 422
+        for x in response.json()['detail']:
+            if x['loc'][-1] == 'birth_date': assert x['msg'] == 'the birth date cannot greater than the current time now'
         # invalid format
         response = client.post(url,json={'nik': '11A', 'institution_id': '1A'})
         assert response.status_code == 422
@@ -280,7 +291,7 @@ class TestClient(OperationTest):
             "nik": "5103051905990006",
             "name": "NYOMAN PRADIPTA DEWANTARA",
             "birth_place": "BALIKPAPAN",
-            "birth_date": "22-08-2021",
+            "birth_date": "22-08-1999",
             "gender": "LAKI-LAKI",
             "phone": "+62 87862265363",
             "address": "PURIGADING",
@@ -294,7 +305,7 @@ class TestClient(OperationTest):
             "nik": "5103051905990006",
             "name": "NYOMAN PRADIPTA DEWANTARA",
             "birth_place": "BALIKPAPAN",
-            "birth_date": "22-08-2021",
+            "birth_date": "22-08-1999",
             "gender": "LAKI-LAKI",
             "phone": "+62 87862265363",
             "address": "PURIGADING",
@@ -308,7 +319,7 @@ class TestClient(OperationTest):
             "nik": "5103051905990006",
             "name": "nyoman pradipta dewantara",
             "birth_place": "balikpapan",
-            "birth_date": "22-08-2021",
+            "birth_date": "22-08-1999",
             "gender": "LAKI-LAKI",
             "phone": "+62 87862265363",
             "address": "purigading",
@@ -329,7 +340,7 @@ class TestClient(OperationTest):
             "nik": "5103051905990006",
             "name": "nyoman pradipta dewantara",
             "birth_place": "balikpapan",
-            "birth_date": "22-08-2021",
+            "birth_date": "22-08-1999",
             "gender": "LAKI-LAKI",
             "phone": "+62 87862265363",
             "address": "purigading",
@@ -346,7 +357,7 @@ class TestClient(OperationTest):
             "nik": "5103051905990006",
             "name": "nyoman pradipta dewantara",
             "birth_place": "balikpapan",
-            "birth_date": "22-08-2021",
+            "birth_date": "22-08-1999",
             "gender": "LAKI-LAKI",
             "phone": "+62 87862265363",
             "address": "purigading",
@@ -362,7 +373,7 @@ class TestClient(OperationTest):
             "nik": "5171010609990002",
             "name": "paulus bonatua simanjuntak",
             "birth_place": "denpasar",
-            "birth_date": "22-08-2021",
+            "birth_date": "22-08-1999",
             "gender": "LAKI-LAKI",
             "phone": "+62 87862265362",
             "address": "denpasar",
@@ -712,6 +723,11 @@ class TestClient(OperationTest):
         assert response.status_code == 422
         for x in response.json()['detail']:
             if x['loc'][-1] == 'birth_date': assert x['msg'] == "time data 'asd' does not match format '%d-%m-%Y'"
+        # check birth_date not greater than current time
+        response = client.put(url + '1',json={'birth_date': format(datetime.now(tz) + timedelta(days=1),tf)})
+        assert response.status_code == 422
+        for x in response.json()['detail']:
+            if x['loc'][-1] == 'birth_date': assert x['msg'] == 'the birth date cannot greater than the current time now'
         # invalid format
         response = client.put(url + '1',json={'nik': '11A'})
         assert response.status_code == 422
@@ -753,7 +769,7 @@ class TestClient(OperationTest):
             "nik": "5103051905990006",
             "name": "NYOMAN PRADIPTA DEWANTARA",
             "birth_place": "BALIKPAPAN",
-            "birth_date": "22-08-2021",
+            "birth_date": "22-08-1999",
             "gender": "LAKI-LAKI",
             "phone": "+62 87862265363",
             "address": "PURIGADING"
@@ -765,7 +781,7 @@ class TestClient(OperationTest):
             "nik": "5171010609990002",
             "name": "NYOMAN PRADIPTA DEWANTARA",
             "birth_place": "BALIKPAPAN",
-            "birth_date": "22-08-2021",
+            "birth_date": "22-08-1999",
             "gender": "LAKI-LAKI",
             "phone": "+62 87862265363",
             "address": "PURIGADING"
@@ -777,7 +793,7 @@ class TestClient(OperationTest):
             "nik": "5103051905990006",
             "name": "dewantara pradipta nyoman",
             "birth_place": "tejakula",
-            "birth_date": "22-08-2021",
+            "birth_date": "22-08-1999",
             "gender": "LAKI-LAKI",
             "phone": "+62 87862265363",
             "address": "kuta selatan"

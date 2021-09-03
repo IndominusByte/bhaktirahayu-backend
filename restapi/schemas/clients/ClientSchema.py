@@ -75,6 +75,12 @@ class ClientCrud(ClientSchema):
         except TypeError:
             raise errors.DatetimeFormatTypeError(type_data=type(v).__name__)
 
+    @validator('birth_date')
+    def validate_birth_date(cls, v):
+        if v > datetime.now(tz):
+            raise errors.BirthDateNotGtError()
+        return v
+
 class ClientCreate(ClientCrud):
     checking_type: Literal['antigen','genose','pcr']
     institution_id: constr(strict=True, regex=r'^[0-9]*$')
