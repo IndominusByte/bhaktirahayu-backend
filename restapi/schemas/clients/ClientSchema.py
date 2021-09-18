@@ -136,6 +136,7 @@ class ClientGetDataByNik(ClientSchema):
     birth_date: datetime
     gender: Literal['LAKI-LAKI','PEREMPUAN']
     address: str
+    type_identity: Literal['NIK','PASPOR']
 
 class ClientGetInfoByNik(ClientSchema):
     nik: str
@@ -174,6 +175,7 @@ class ClientData(ClientSchema):
     clients_birth_date: datetime
     clients_gender: Literal['LAKI-LAKI','PEREMPUAN']
     clients_address: str
+    clients_type_identity: Literal['NIK','PASPOR']
     clients_created_at: datetime
     clients_updated_at: datetime
     covid_checkups: List[ClientCovidCheckupData]
@@ -187,6 +189,7 @@ class ClientExportData(ClientSchema):
     clients_birth_date: datetime
     clients_gender: Literal['LAKI-LAKI','PEREMPUAN']
     clients_address: str
+    clients_type_identity: Literal['NIK','PASPOR']
     covid_checkups_checking_type: Literal['antigen','genose','pcr']
     covid_checkups_check_date: Optional[datetime]
     covid_checkups_check_result: Optional[Literal['positive','negative']]
