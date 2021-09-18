@@ -406,10 +406,10 @@ class TestClient(OperationTest):
         for x in response.json()['detail']:
             if x['loc'][-1] == 'nik': assert x['msg'] == 'ensure this value has at least 1 characters'
         # check all field type data
-        response = client.get(url + '?nik=1A')
+        response = client.get(url + '?nik=1a')
         assert response.status_code == 422
         for x in response.json()['detail']:
-            if x['loc'][-1] == 'nik': assert x['msg'] == 'string does not match regex \"^[0-9]*$\"'
+            if x['loc'][-1] == 'nik': assert x['msg'] == 'string does not match regex \"^[A-Z0-9]*$\"'
 
     def test_get_client_data_by_nik(self,client):
         url = self.prefix + '/get-data-by-nik'

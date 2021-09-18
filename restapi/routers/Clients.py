@@ -101,7 +101,7 @@ async def create_client(client_data: ClientCreate, response: Response):
     return {"detail": "Successfully registration."}
 
 @router.get('/get-data-by-nik',response_model=ClientGetDataByNik)
-async def get_client_data_by_nik(nik: str = Query(...,min_length=1,regex=r'^[0-9]*$')):
+async def get_client_data_by_nik(nik: str = Query(...,min_length=1,regex=r'^[A-Z0-9]*$')):
     return await ClientFetch.filter_by_nik(nik)
 
 @router.get('/get-info-by-nik',response_model=ClientGetInfoByNik)
