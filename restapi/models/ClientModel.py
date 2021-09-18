@@ -10,6 +10,7 @@ client = Table('clients', metadata,
     Column('birth_date', DateTime, nullable=False),
     Column('gender', String(50), nullable=False),
     Column('address', Text, nullable=False),
+    Column('type_identity', String(10), server_default='NIK'),
     Column('created_at', DateTime, default=func.now()),
     Column('updated_at', DateTime, default=func.now()),
 )

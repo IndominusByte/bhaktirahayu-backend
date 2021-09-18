@@ -38,13 +38,25 @@ class ClientDataImageOcr(ClientSchema):
         if v: return datetime.strptime(v, tf)
 
 class ClientCrud(ClientSchema):
-    nik: constr(strict=True, min_length=3, max_length=100, regex=r'^[0-9]*$')
+    nik: constr(strict=True, min_length=3, max_length=100)
     name: constr(strict=True, min_length=3, max_length=100)
     birth_place: constr(strict=True, min_length=3, max_length=100)
     birth_date: datetime
     gender: Literal['LAKI-LAKI','PEREMPUAN']
     phone: constr(strict=True, max_length=20)
     address: constr(strict=True, min_length=5)
+    type_identity: Literal['nik','paspor']
+
+    @validator('type_identity')
+    def check_valid_identity(cls, v, values, **kwargs):
+        if 'nik' in values and v == 'nik':
+            if nik_extraction.nik_extract(values['nik'])['valid'] is False:
+                raise ValueError('invalid nik format')
+        if 'nik' in values and v == 'paspor':
+            # validation paspor
+            pass
+
+        return v
 
     @validator('phone')
     def validate_phone(cls, v):
@@ -59,12 +71,6 @@ class ClientCrud(ClientSchema):
             raise errors.PhoneNumberError()
 
         return format_number(n, PhoneNumberFormat.INTERNATIONAL)
-
-    @validator('nik')
-    def check_valid_nik(cls, v):
-        if nik_extraction.nik_extract(v)['valid'] is False:
-            raise ValueError('invalid nik format')
-        return v
 
     @validator('birth_date', pre=True)
     def parse_discount_format(cls, v):
@@ -84,6 +90,7 @@ class ClientCrud(ClientSchema):
 class ClientCreate(ClientCrud):
     checking_type: Literal['antigen','genose','pcr']
     institution_id: constr(strict=True, regex=r'^[0-9]*$')
+    location_service_id: Optional[constr(strict=True, regex=r'^[0-9]*$')]
 
     class Config:
         schema_extra = {
@@ -96,11 +103,13 @@ class ClientCreate(ClientCrud):
                 "phone": "+62 87862265363",
                 "address": "PURIGADING",
                 "checking_type": "antigen",
-                "institution_id": "1"
+                "institution_id": "1",
+                "location_service_id": "1",
+                "type_identity": "nik"
             }
         }
 
-    @validator('institution_id')
+    @validator('institution_id', 'location_service_id')
     def parse_str_to_int(cls, v):
         return int(v) if v else None
 
@@ -114,7 +123,8 @@ class ClientUpdate(ClientCrud):
                 "birth_date": format(datetime.now(tz), tf),
                 "gender": "LAKI-LAKI",
                 "phone": "+62 87862265363",
-                "address": "PURIGADING"
+                "address": "PURIGADING",
+                "type_identity": "nik"
             }
         }
 

@@ -46,6 +46,12 @@ class CovidCheckupUpdate(CovidCheckupSchema):
         except TypeError:
             raise errors.DatetimeFormatTypeError(type_data=type(v).__name__)
 
+    @validator('check_date')
+    def validate_check_date(cls, v):
+        if v >= datetime.now(tz):
+            raise errors.CheckDateNotGtError()
+        return v
+
 class CovidCheckupDocumentData(CovidCheckupSchema):
     clients_nik: str
     clients_name: str

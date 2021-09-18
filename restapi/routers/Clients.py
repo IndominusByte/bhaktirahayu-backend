@@ -3,6 +3,7 @@ from fastapi_jwt_auth import AuthJWT
 from controllers.CovidCheckupController import CovidCheckupCrud, CovidCheckupLogic
 from controllers.ClientController import ClientCrud, ClientFetch
 from controllers.InstitutionController import InstitutionFetch
+from controllers.LocationServiceController import LocationServiceFetch
 from dependencies.ClientDependant import (
     identity_card_ocr_form, get_all_query_client_paginate,
     get_all_query_client_export
@@ -64,21 +65,25 @@ async def create_client(client_data: ClientCreate, response: Response):
                 raise HTTPException(status_code=404,detail=f"The institution does not have {kind} checking.")
     else: raise HTTPException(status_code=404,detail="Institution not found!")
 
+    # check location service if exists
+    if client_data.location_service_id and not await LocationServiceFetch.filter_by_id(client_data.location_service_id):
+        raise HTTPException(status_code=404,detail="Location-service not found!")
+
     client_data.birth_date = client_data.birth_date.replace(tzinfo=None)
     # make client identity to uppercase
     client_identity = {
-        **{k:v.upper() for k,v in client_data.dict(exclude={'birth_date','checking_type','institution_id'}).items()},
+        **{k:v.upper() for k,v in client_data.dict(exclude={'birth_date','checking_type','institution_id','location_service_id'}).items()},
         **{'birth_date': client_data.birth_date}
     }
 
-    covid_checkup_data = client_data.dict(include={'checking_type','institution_id'})
+    covid_checkup_data = client_data.dict(include={'checking_type','institution_id','location_service_id'})
 
     # update client when nik exists in db
-    if client := await ClientFetch.filter_by_nik(client_data.nik):
+    if client := await ClientFetch.filter_by_nik(client_identity['nik']):
         # cannot register many times in same institute on same day
         if await CovidCheckupLogic.covid_checkup_on_same_date_and_institution(
-            client_data.checking_type,
-            client_data.institution_id,
+            covid_checkup_data['checking_type'],
+            covid_checkup_data['institution_id'],
             client['id']
         ):
             raise HTTPException(
@@ -139,9 +144,6 @@ async def update_client(
     authorize.jwt_required()
 
     if client := await ClientFetch.filter_by_id(client_id):
-        if client['nik'] != client_data.nik and await ClientFetch.filter_by_nik(client_data.nik):
-            raise HTTPException(status_code=400,detail="The nik has already been taken.")
-
         client_data.birth_date = client_data.birth_date.replace(tzinfo=None)
         # make client identity to uppercase
         client_identity = {
@@ -149,7 +151,11 @@ async def update_client(
             **{'birth_date': client_data.birth_date}
         }
 
+        if client['nik'] != client_identity['nik'] and await ClientFetch.filter_by_nik(client_identity['nik']):
+            raise HTTPException(status_code=400,detail="The nik has already been taken.")
+
         await ClientCrud.update_client(client['id'],**client_identity)
+
         return {"detail": "Successfully update the client."}
     raise HTTPException(status_code=404,detail="Client not found!")
 

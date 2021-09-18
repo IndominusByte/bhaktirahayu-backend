@@ -183,6 +183,7 @@ class TestClient(OperationTest):
             if x['loc'][-1] == 'address': assert x['msg'] == 'field required'
             if x['loc'][-1] == 'checking_type': assert x['msg'] == 'field required'
             if x['loc'][-1] == 'institution_id': assert x['msg'] == 'field required'
+            if x['loc'][-1] == 'type_identity': assert x['msg'] == 'field required'
         # all field blank
         response = client.post(url,json={
             "nik": "",
@@ -193,7 +194,8 @@ class TestClient(OperationTest):
             "phone": "",
             "address": "",
             "checking_type": "",
-            "institution_id": ""
+            "institution_id": "",
+            "type_identity": ""
         })
         assert response.status_code == 422
         for x in response.json()['detail']:
@@ -231,7 +233,8 @@ class TestClient(OperationTest):
             "phone": 123,
             "address": 123,
             "checking_type": 123,
-            "institution_id": 123
+            "institution_id": 123,
+            "type_identity": 123,
         })
         assert response.status_code == 422
         for x in response.json()['detail']:
@@ -244,6 +247,7 @@ class TestClient(OperationTest):
             if x['loc'][-1] == 'address': assert x['msg'] == 'str type expected'
             if x['loc'][-1] == 'checking_type': assert x['msg'] == "unexpected value; permitted: 'antigen', 'genose', 'pcr'"
             if x['loc'][-1] == 'institution_id': assert x['msg'] == 'str type expected'
+            if x['loc'][-1] == 'type_identity': assert x['msg'] == "unexpected value; permitted: 'nik', 'paspor'"
         # check birth_date format
         response = client.post(url,json={'birth_date': 'asd'})
         assert response.status_code == 422
@@ -296,7 +300,8 @@ class TestClient(OperationTest):
             "phone": "+62 87862265363",
             "address": "PURIGADING",
             "checking_type": "antigen",
-            "institution_id": "9" * 8
+            "institution_id": "9" * 8,
+            "type_identity": "nik"
         })
         assert response.status_code == 404
         assert response.json() == {"detail": "Institution not found!"}
@@ -310,7 +315,8 @@ class TestClient(OperationTest):
             "phone": "+62 87862265363",
             "address": "PURIGADING",
             "checking_type": "pcr",
-            "institution_id": str(institution_id)
+            "institution_id": str(institution_id),
+            "type_identity": "nik"
         })
         assert response.status_code == 404
         assert response.json() == {"detail": "The institution does not have pcr checking."}
@@ -324,7 +330,8 @@ class TestClient(OperationTest):
             "phone": "+62 87862265363",
             "address": "purigading",
             "checking_type": "antigen",
-            "institution_id": str(institution_id)
+            "institution_id": str(institution_id),
+            "type_identity": "nik"
         })
         assert response.status_code == 201
         assert response.json() == {"detail": "Successfully registration."}
@@ -345,7 +352,8 @@ class TestClient(OperationTest):
             "phone": "+62 87862265363",
             "address": "purigading",
             "checking_type": "antigen",
-            "institution_id": str(institution_id)
+            "institution_id": str(institution_id),
+            "type_identity": "nik"
         })
         assert response.status_code == 400
         assert response.json() == \
@@ -362,7 +370,8 @@ class TestClient(OperationTest):
             "phone": "+62 87862265363",
             "address": "purigading",
             "checking_type": "antigen",
-            "institution_id": str(institution_id)
+            "institution_id": str(institution_id),
+            "type_identity": "nik"
         })
         assert response.status_code == 200
         assert response.json() == {"detail": "Successfully registration."}
@@ -378,7 +387,8 @@ class TestClient(OperationTest):
             "phone": "+62 87862265362",
             "address": "denpasar",
             "checking_type": "antigen",
-            "institution_id": str(institution_id)
+            "institution_id": str(institution_id),
+            "type_identity": "nik"
         })
         assert response.status_code == 201
         assert response.json() == {"detail": "Successfully registration."}
@@ -772,7 +782,8 @@ class TestClient(OperationTest):
             "birth_date": "22-08-1999",
             "gender": "LAKI-LAKI",
             "phone": "+62 87862265363",
-            "address": "PURIGADING"
+            "address": "PURIGADING",
+            "type_identity": "nik"
         },headers={'X-CSRF-TOKEN': csrf_access_token})
         assert response.status_code == 404
         assert response.json() == {"detail": "Client not found!"}
@@ -784,7 +795,8 @@ class TestClient(OperationTest):
             "birth_date": "22-08-1999",
             "gender": "LAKI-LAKI",
             "phone": "+62 87862265363",
-            "address": "PURIGADING"
+            "address": "PURIGADING",
+            "type_identity": "nik"
         },headers={'X-CSRF-TOKEN': csrf_access_token})
         assert response.status_code == 400
         assert response.json() == {"detail": "The nik has already been taken."}
@@ -796,7 +808,8 @@ class TestClient(OperationTest):
             "birth_date": "22-08-1999",
             "gender": "LAKI-LAKI",
             "phone": "+62 87862265363",
-            "address": "kuta selatan"
+            "address": "kuta selatan",
+            "type_identity": "nik"
         },headers={'X-CSRF-TOKEN': csrf_access_token})
         assert response.status_code == 200
         assert response.json() == {"detail": "Successfully update the client."}

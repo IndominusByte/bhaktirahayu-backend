@@ -51,7 +51,8 @@ class TestCovidCheckup(OperationTest):
             "phone": "+62 87862265363",
             "address": "purigading",
             "checking_type": "antigen",
-            "institution_id": str(institution_id)
+            "institution_id": str(institution_id),
+            "type_identity": "nik"
         })
         assert response.status_code == 201
         assert response.json() == {"detail": "Successfully registration."}

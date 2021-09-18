@@ -30,3 +30,9 @@ class PasswordConfirmError(PydanticValueError):
 class BirthDateNotGtError(PydanticValueError):
     code = 'birth_date.not_gt'
     msg_template = 'the birth date cannot greater than the current time now'
+
+# ========= CLIENT SECTION =========
+
+class CheckDateNotGtError(PydanticValueError):
+    code = 'check_date.not_gt'
+    msg_template = 'the check date cannot greater than the current time now'
